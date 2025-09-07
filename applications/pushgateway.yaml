@@ -5,9 +5,9 @@ metadata:
 spec:
   destination:
     namespace: monitoring
-    server: "<https://kubernetes.default.svc>"
+    server: https://kubernetes.default.svc
   source:
-    repoURL: "<https://prometheus-community.github.io/helm-charts>"
+    repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
     targetRevision: 71.2.0
     helm:
@@ -20,10 +20,13 @@ spec:
             enabled: false
         alertmanager:
           enabled: false
+        prometheus-pushgateway:
+          enabled: true
   project: default
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
+
       - CreateNamespace=true
