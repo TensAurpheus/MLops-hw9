@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mlops-root
+  namespace: argocd   # ArgoCD itself runs here
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TensAurpheus/MLops-hw9.git
+    targetRevision: HEAD
+    path: applications   # folder containing mlflow.yaml, minio.yaml, postgres.yaml, pushgateway.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd           # only for the root app object, child apps define their own namespaces
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

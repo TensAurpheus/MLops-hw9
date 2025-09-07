@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mlflow
+spec:
+  destination:
+    namespace: mlflow
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://community-charts.github.io/helm-charts
+    chart: mlflow
+    targetRevision: 0.6.2
+    helm:
+      valuesObject:
+        image:
+          repository: ghcr.io/community-charts/mlflow
+          tag: latest
+
+        backendStore:
+          database: postgresql
+          postgres:
+            host: mlflow-postgres.mlflow.svc.cluster.local
+            port: 5432
+            database: mlflow
+            user: mlflow
+            password: mlflowpass
+
+        artifactStore:
+          defaultArtifactRoot: s3://mlflow-artifacts
+          s3:
+            endpointUrl: http://minio.mlflow.svc.cluster.local:9000
+            bucketName: mlflow-artifacts
+            accessKey: minio
+            secretKey: minio123
+
+        service:
+          type: ClusterIP
+          port: 5000
+
+        envFromSecret: mlflow-secrets
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
