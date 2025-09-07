@@ -2,31 +2,36 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: monitoring
+  namespace: infra-tools
 spec:
-  destination:
-    namespace: monitoring
-    server: https://kubernetes.default.svc
+  project: default
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 71.2.0
+    targetRevision: 62.1.1  # Stable version supporting Pushgateway and Grafana
     helm:
-      valuesObject:
-        grafana:
-          ingress:
-            enabled: false
-        prometheus:
-          ingress:
-            enabled: false
-        alertmanager:
-          enabled: false
+      values: |
         prometheus-pushgateway:
           enabled: true
-  project: default
+          service:
+            type: ClusterIP
+            port: 9091
+        grafana:
+          enabled: true
+          service:
+            type: ClusterIP
+            port: 3000
+        prometheus:
+          enabled: false
+        alertmanager:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-
       - CreateNamespace=true
+
