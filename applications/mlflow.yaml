@@ -8,15 +8,14 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://charts.bitnami.com/bitnami
     chart: mlflow
-    targetRevision: 1.1.6  # Latest stable version as of recent sources
+    targetRevision: 5.1.17  # Latest Bitnami MLflow chart version
     helm:
       valuesObject:
         image:
           registry: docker.io
           repository: bitnami/mlflow
-          tag: 2.17.0  # Compatible with chart version
+          tag: 2.17.0  # Compatible MLflow image tag
         backendStoreURI: postgresql://mlflow:mlflowpass@mlflow-postgres.mlflow.svc.cluster.local:5432/mlflow
         defaultArtifactRoot: s3://mlflow-artifacts
         extraEnvVars:
@@ -36,5 +35,6 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
 
