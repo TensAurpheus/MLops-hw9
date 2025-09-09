@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: monitoring
+  namespace: infra-tools
 spec:
   destination:
     namespace: monitoring
@@ -15,11 +16,15 @@ spec:
         grafana:
           ingress:
             enabled: false
+          service:
+            type: ClusterIP
         prometheus:
           ingress:
             enabled: false
         alertmanager:
           enabled: false
+        prometheusOperator:
+          createCustomResource: true
   project: default
   syncPolicy:
     automated:
