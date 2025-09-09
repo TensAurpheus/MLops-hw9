@@ -8,41 +8,33 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    repoURL: https://community-charts.github.io/helm-charts
+    repoURL: https://charts.bitnami.com/bitnami
     chart: mlflow
-    targetRevision: 0.6.2
+    targetRevision: 1.1.6  # Latest stable version as of recent sources
     helm:
       valuesObject:
         image:
-          repository: ghcr.io/community-charts/mlflow
-          tag: 0.6.2
-
-        backendStore:
-          database: postgresql
-          postgres:
-            host: mlflow-postgres.mlflow.svc.cluster.local
-            port: 5432
-            database: mlflow
-            user: mlflow
-            password: mlflowpass
-
-        artifactStore:
-          defaultArtifactRoot: s3://mlflow-artifacts
-          s3:
-            endpointUrl: http://minio.mlflow.svc.cluster.local:9000
-            bucketName: mlflow-artifacts
-            accessKey: minio
-            secretKey: minio123
-
+          registry: docker.io
+          repository: bitnami/mlflow
+          tag: 2.17.0  # Compatible with chart version
+        backendStoreURI: postgresql://mlflow:mlflowpass@mlflow-postgres.mlflow.svc.cluster.local:5432/mlflow
+        defaultArtifactRoot: s3://mlflow-artifacts
+        extraEnvVars:
+          - name: MLFLOW_S3_ENDPOINT_URL
+            value: http://minio.mlflow.svc.cluster.local:9000
+          - name: AWS_ACCESS_KEY_ID
+            value: minio
+          - name: AWS_SECRET_ACCESS_KEY
+            value: minio123
         service:
           type: ClusterIP
           port: 5000
-
-        envFromSecret: mlflow-secrets
+        existingSecret: mlflow-secrets
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
