@@ -15,7 +15,9 @@ spec:
       valuesObject:
         image:
           repository: ghcr.io/community-charts/mlflow
-          tag: latest
+          tag: 0.6.2
+          pullSecrets:
+            name: ghcr-creds
 
         backendStore:
           database: postgresql
@@ -45,6 +47,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
 
 
