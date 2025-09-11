@@ -1,41 +1,52 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: mlflow
+  name: mlflow-app
   namespace: infra-tools
+  labels:
+    app.kubernetes.io/name: mlflow
+    app.kubernetes.io/component: ml-platform
+    environment: dev
 spec:
-  destination:
-    namespace: mlflow
-    server: https://kubernetes.default.svc
   project: default
   source:
-    chart: oci://registry-1.docker.io/bitnamicharts/mlflow
-    targetRevision: 5.1.17  # Valid Bitnami MLflow chart version
+    repoURL: https://community-charts.github.io/helm-charts
+    chart: mlflow
+    targetRevision: 0.7.19  # Version from your Chart.yaml dependency
     helm:
-      valuesObject:
+      values: |
         image:
-          registry: docker.io
-          repository: bitnami/mlflow
-          tag: 2.17.0  # Compatible with chart version
-        backendStoreURI: postgresql://mlflow:mlflowpass@mlflow-postgres.mlflow.svc.cluster.local:5432/mlflow
-        defaultArtifactRoot: s3://mlflow-artifacts
-        extraEnvVars:
-          - name: MLFLOW_S3_ENDPOINT_URL
-            value: http://minio.mlflow.svc.cluster.local:9000
-          - name: AWS_ACCESS_KEY_ID
-            value: minio
-          - name: AWS_SECRET_ACCESS_KEY
-            value: minio123
+          repository: ghcr.io/community-charts/mlflow
+          tag: 2.17.0  # Compatible with chart version 0.7.19
+        backendStore:
+          database: postgresql
+          postgres:
+            host: mlflow-postgres.mlflow.svc.cluster.local
+            port: 5432
+            database: mlflow
+            user: mlflow
+            password: mlflowpass
+        artifactStore:
+          defaultArtifactRoot: s3://mlflow-artifacts
+          s3:
+            endpointUrl: http://minio.mlflow.svc.cluster.local:9000
+            bucketName: mlflow-artifacts
+            accessKey: minio
+            secretKey: minio123
         service:
           type: ClusterIP
           port: 5000
-        existingSecret: mlflow-secrets
+        envFromSecret: mlflow-secrets
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mlflow
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
 
 
