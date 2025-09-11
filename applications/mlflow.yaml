@@ -2,14 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: mlflow
+  namespace: infra-tools  # Align with root-app.yaml
 spec:
   destination:
     namespace: mlflow
     server: https://kubernetes.default.svc
   project: default
   source:
+    repoURL: https://charts.bitnami.com/bitnami
     chart: mlflow
-    targetRevision: 5.1.17  # Latest Bitnami MLflow chart version
+    targetRevision: 6.0.2  # Latest Bitnami MLflow chart version
     helm:
       valuesObject:
         image:
@@ -28,13 +30,14 @@ spec:
         service:
           type: ClusterIP
           port: 5000
-        existingSecret: mlflow-secrets
+        existingSecret: ""  # Disable if mlflow-secrets doesn't exist
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
 
 
 
