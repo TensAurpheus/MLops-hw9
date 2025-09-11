@@ -2,27 +2,94 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: minio
+  namespace: infra-tools
+  labels:
+    app: minio
+    component: storage
 spec:
-  destination:
-    namespace: mlflow
-    server: https://kubernetes.default.svc
   project: default
   source:
     repoURL: https://charts.bitnami.com/bitnami
     chart: minio
-    targetRevision: 13.7.2
+    targetRevision: 17.0.21
     helm:
-      valuesObject:
-      auth:
+      values: |
+        mode: standalone
+        auth:
           rootUser: minio
           rootPassword: minio123
-      defaultBuckets: mlflow-artifacts
-      service:
+        resources:
+          limits:
+            cpu: 250m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        statefulset:
+          replicaCount: 1
+        persistence:
+          enabled: true
+          storageClass: ""
+          size: 5Gi
+          accessModes:
+            - ReadWriteOnce
+        provisioning:
+          enabled: false
+        service:
           type: ClusterIP
+          ports:
+            api: 9000
+            console: 9001
+        ingress:
+          enabled: false
+        consoleIngress:
+          enabled: false
+        metrics:
+          serviceMonitor:
+            enabled: false
+        containerSecurityContext:
+          enabled: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+        podSecurityContext:
+          enabled: true
+          fsGroup: 1001
+          fsGroupChangePolicy: "OnRootMismatch"
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
+        extraEnvVars: []
+        extraVolumes: []
+        extraVolumeMounts: []
+        livenessProbe:
+          enabled: true
+          initialDelaySeconds: 5
+          periodSeconds: 30
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        readinessProbe:
+          enabled: true
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        defaultBuckets: mlflow-artifacts
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: mlflow
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
+      - ServerSideApply=true
+  revisionHistoryLimit: 3
