@@ -1,42 +1,70 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: mlflow-app
+  name: mlflow-community
   namespace: infra-tools
   labels:
-    app.kubernetes.io/name: mlflow
-    app.kubernetes.io/component: ml-platform
-    environment: dev
+    app: mlflow
+    component: ml-platform
 spec:
   project: default
   source:
     repoURL: https://community-charts.github.io/helm-charts
     chart: mlflow
-    targetRevision: 0.7.19  # Version from your Chart.yaml dependency
+    targetRevision: 1.6.2
     helm:
       values: |
+        replicaCount: 1
         image:
-          repository: ghcr.io/community-charts/mlflow
-          tag: 2.17.0  # Compatible with chart version 0.7.19
+          repository: docker.io/burakince/mlflow
+          pullPolicy: IfNotPresent
+          tag: ""  # Use chart default or specify compatible tag (e.g., 2.17.0)
+        service:
+          enabled: true
+          type: ClusterIP
+          port: 5000
+          name: http
+          containerPort: 5000
+          containerPortName: mlflow
+          annotations: {}
+        log:
+          enabled: true
+          level: info
+        telemetry:
+          enabled: false
         backendStore:
-          database: postgresql
+          databaseMigration: true
+          databaseConnectionCheck: true
           postgres:
+            enabled: true
             host: mlflow-postgres.mlflow.svc.cluster.local
             port: 5432
             database: mlflow
             user: mlflow
             password: mlflowpass
-        artifactStore:
-          defaultArtifactRoot: s3://mlflow-artifacts
+            driver: psycopg2
+          existingDatabaseSecret:
+            name: mlflow-secrets
+            usernameKey: mlflow-user
+            passwordKey: mlflow-password
+        artifactRoot:
           s3:
-            endpointUrl: http://minio.mlflow.svc.cluster.local:9000
-            bucketName: mlflow-artifacts
-            accessKey: minio
-            secretKey: minio123
-        service:
-          type: ClusterIP
-          port: 5000
-        envFromSecret: mlflow-secrets
+            enabled: true
+            bucket: mlflow-artifacts
+            defaultArtifactRoot: s3://mlflow-artifacts
+            existingSecret:
+              name: mlflow-secrets
+              keyOfAccessKeyId: minio-access-key
+              keyOfSecretAccessKey: minio-secret-key
+        extraEnvVars:
+          MLFLOW_S3_ENDPOINT_URL: http://minio.mlflow.svc.cluster.local:9000
+          MLFLOW_S3_IGNORE_TLS: "true"
+        auth:
+          enabled: true
+          existingAdminSecret:
+            name: mlflow-secrets
+            usernameKey: admin-username
+            passwordKey: admin-password
   destination:
     server: https://kubernetes.default.svc
     namespace: mlflow
@@ -46,15 +74,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
-
-
-
-
-
-
-
-
-
-
-
+      - ServerSideApply=true
+  revisionHistoryLimit: 3
