@@ -29,7 +29,7 @@ spec:
           replicaCount: 1
         persistence:
           enabled: true
-          storageClass: ""
+          storageClass: gp2
           size: 5Gi
           accessModes:
             - ReadWriteOnce
@@ -93,3 +93,4 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
   revisionHistoryLimit: 3
+
