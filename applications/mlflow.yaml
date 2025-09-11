@@ -10,12 +10,12 @@ spec:
   source:
     repoURL: https://community-charts.github.io/helm-charts
     chart: mlflow
-    targetRevision: 0.6.2
+    targetRevision: 1.6.2
     helm:
       valuesObject:
         image:
-          repository: community-charts/mlflow
-          tag: 0.6.2
+          repository: docker.io/burakince/mlflow
+          tag: ""
           
 
         backendStore:
@@ -46,3 +46,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
