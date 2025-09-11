@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: mlflow
+  name: mlflow-community
   namespace: infra-tools
   labels:
     app: mlflow
@@ -18,7 +18,7 @@ spec:
         image:
           repository: docker.io/burakince/mlflow
           pullPolicy: IfNotPresent
-          tag: "2.17.0"  # Compatible with chart version 1.6.2
+          tag: ""  # Use chart default or specify compatible tag (e.g., 2.17.0)
         service:
           enabled: true
           type: ClusterIP
@@ -48,10 +48,10 @@ spec:
             usernameKey: mlflow-user
             passwordKey: mlflow-password
         artifactRoot:
-          defaultArtifactRoot: s3://mlflow-artifacts
           s3:
             enabled: true
             bucket: mlflow-artifacts
+            defaultArtifactRoot: s3://mlflow-artifacts
             existingSecret:
               name: mlflow-secrets
               keyOfAccessKeyId: minio-access-key
@@ -76,5 +76,6 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
   revisionHistoryLimit: 3
+
 
 
