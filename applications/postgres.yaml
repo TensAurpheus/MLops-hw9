@@ -19,11 +19,12 @@ spec:
           database: mlflow
         primary:
           persistence:
-            enabled: true
-            size: 1Gi
+            enabled: false
+
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
