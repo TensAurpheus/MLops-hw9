@@ -16,8 +16,8 @@ spec:
       values: |
         replicaCount: 1
         image:
-          repository: docker.io/msolonin/mlflow
-          tag: psycopg21
+          repository: ghcr.io/mlflow/mlflow:v2.8.1
+          
         service:
           enabled: true
           type: ClusterIP
@@ -66,6 +66,7 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
   revisionHistoryLimit: 3
+
 
 
 
