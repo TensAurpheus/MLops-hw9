@@ -54,7 +54,7 @@ spec:
             endpointUrl: http://minio.mlflow.svc.cluster.local:9000
         extraEnvFrom:
           - secretRef:
-              name: secrets
+              name: mlflow-secrets
         
   destination:
     server: https://kubernetes.default.svc
@@ -67,6 +67,7 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
   revisionHistoryLimit: 3
+
 
 
 
