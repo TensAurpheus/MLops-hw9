@@ -43,22 +43,18 @@ spec:
             user: mlflow
             password: mlflowpass
             driver: psycopg2
-          existingDatabaseSecret:
-            name: mlflow-secrets
-            usernameKey: mlflow-user
-            passwordKey: mlflow-password
+          
         artifactRoot:
           
           s3:
             enabled: true
             bucket: mlflow-artifacts
-            existingSecret:
-              name: mlflow-secrets
-              keyOfAccessKeyId: minio-access-key
-              keyOfSecretAccessKey: minio-secret-key
-        extraEnvVars:
-          MLFLOW_S3_ENDPOINT_URL: http://minio.mlflow.svc.cluster.local:9000
-          MLFLOW_S3_IGNORE_TLS: "true"
+            accessKey: minio
+            secretKey: minio123
+            endpointUrl: http://minio.mlflow.svc.cluster.local:9000
+        extraEnvFrom:
+          - secretRef:
+              name: secrets
         
   destination:
     server: https://kubernetes.default.svc
@@ -71,6 +67,7 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
   revisionHistoryLimit: 3
+
 
 
 
