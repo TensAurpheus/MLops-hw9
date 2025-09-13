@@ -11,14 +11,13 @@ spec:
   source:
     repoURL: https://community-charts.github.io/helm-charts
     chart: mlflow
-    targetRevision: 1.6.2
+    targetRevision: 0.6.2
     helm:
       values: |
         replicaCount: 1
         image:
-          repository: docker.io/burakince/mlflow
-          pullPolicy: IfNotPresent
-          tag: "2.17.0"  # Compatible with chart version 1.6.2
+          repository: docker.io/msolonin/mlflow
+          tag: psycopg21
         service:
           enabled: true
           type: ClusterIP
@@ -67,6 +66,7 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
   revisionHistoryLimit: 3
+
 
 
 
