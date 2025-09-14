@@ -1,0 +1,26 @@
+{
+  "run_id": "b7dbc380d5524e418ee9b74889f19b9c",
+  "timestamp": "20250914_153102",
+  "learning_rate": 0.001,
+  "epochs": 100,
+  "accuracy": 0.8157894736842105,
+  "loss": 0.9775547082006295,
+  "model_version": "1.0.0",
+  "model_name": "iris_model",
+  "model_file": "models\\iris_model_20250914_153102_acc_0.816.pkl",
+  "data_shape": [
+    112,
+    4
+  ],
+  "features": [
+    "sepal_length",
+    "sepal_width",
+    "petal_length",
+    "petal_width"
+  ],
+  "classes": [
+    "setosa",
+    "versicolor",
+    "virginica"
+  ]
+}
